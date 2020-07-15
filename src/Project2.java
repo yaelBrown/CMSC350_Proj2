@@ -1,7 +1,7 @@
 /*
 Filename: Project2.java
 Author: Yael Brown
-Date:
+Date: 7/14/2020
 Brief Purpose of the Program:
 */
 
