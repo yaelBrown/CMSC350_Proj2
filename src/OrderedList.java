@@ -9,12 +9,12 @@ import java.util.List;
 
 public class OrderedList {
     // Comparable
-    public class static checkSorted(List p) {
+    public static void checkSorted(List p) {
 
     }
 
     // Comparator
-    public class static checkSorted(List p) {
-
+    public static int checkSorted() {
+        return 1;
     }
 }

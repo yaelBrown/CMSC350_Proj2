@@ -5,12 +5,16 @@ Date: 7/14/2020
 Brief Purpose of the Program:
 */
 
+import java.util.Comparator;
 import java.util.Iterator;
 
 public class Polynomial implements Iterable, Comparable {
+    private String polyStr = null;
+    Comparator<Polynomial> compare;
 
-    public Polynomial() throws InvalidPolynomialSyntax {
-        return "cool";
+    public Polynomial(String pS) throws InvalidPolynomialSyntax {
+        this.polyStr = pS;
+
     }
 
     @Override
@@ -25,7 +29,7 @@ public class Polynomial implements Iterable, Comparable {
 
     @Override
     public String toString() {
-        return "Polynomial{}";
+        return this.polyStr;
     }
 
 }
