@@ -89,9 +89,7 @@ public class Project2 {
      * @return
      */
     public static String trueFalseYesNoConversion(boolean tf) {
-        if (tf == true) {
-            return "Yes";
-        }
+        if (tf == true) { return "Yes"; }
         return "No";
     }
 

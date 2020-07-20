@@ -11,24 +11,59 @@ import java.util.Iterator;
 
 class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
 
-    Comparator<Polynomial> compare;
-    public Poly head;
+    /**
+     * Polynomial sub class
+     */
+    public static class Poly {
+        public Poly next;
+        private Poly head;
+        public double coef;
+        public int exp;
+
+        public Poly(double c, int e) {
+            coef = c;
+            exp = e;
+            next = null;
+        }
+
+        public int getExponent() {
+            return this.exp;
+        }
+        public double getCoefficient() {
+            return this.coef;
+        }
+        public Poly getNext() {
+            return next;
+        }
+        public Poly getHead() { return head; }
+
+        @Override
+        public String toString() {
+            String termStr = String.format("", Math.abs(coef));
+            switch(exp) {
+                case 0:
+                    return termStr;
+                case 1:
+                    return termStr + "x";
+                default:
+                    return termStr + "x^" + exp;
+            }
+        }
+    }
+
+    Comparator<Polynomial> compare = Polynomial::comparePoly;
+    public Poly head = null;
 
     /**
      * Constructor for Polynomial's
-     * @param fromFile
+     * @param pStr
      */
-    public Polynomial(String fromFile) {
-        compare = Polynomial::comparePoly;
-        head = null;
-
-        Scanner termScanner = new Scanner(fromFile);
+    public Polynomial(String pStr) {
+        Scanner termScanner = new Scanner(pStr);
         try {
-            while (termScanner.hasNext()) {
-                addTerm(termScanner.nextDouble(), termScanner.nextInt());
-            }
-        } catch (Exception ex) {
-            System.out.println(ex.getLocalizedMessage());
+            while (termScanner.hasNext()) { addTerm(termScanner.nextDouble(), termScanner.nextInt()); }
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new InvalidPolynomialSyntax("Input error");
         }
     }
@@ -39,20 +74,14 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
      * @param exponent
      */
     public void addTerm(double coefficient, int exponent) {
-        if (exponent < 0) {
-            throw new InvalidPolynomialSyntax("Cannot process negative polynomials");
-        }
+        if (exponent < 0) { throw new InvalidPolynomialSyntax("Cannot process negative polynomials"); }
+        Poly cur = null;
+        head = new Poly(coefficient, exponent);
+        head.next = null;
 
-        Poly current = head;
-
-        if (current == null) {
-            head = new Poly(coefficient, exponent);
-            head.next = null;
-        } else {
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = new Poly(coefficient, exponent);
+        if (cur != null) {
+            while (cur.next != null) { cur = cur.next; }
+            cur.next = new Poly(coefficient, exponent);
         }
     }
 
@@ -66,6 +95,9 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
         Poly thisCurrent = this.head;
         Poly otherCurrent = poly3.head;
 
+        if (thisCurrent.equals(null) && otherCurrent.equals(null)) return 0;
+        if (thisCurrent.equals(null)) return -1;
+
         while (thisCurrent != null && otherCurrent != null) {
             if (thisCurrent.getExponent() != otherCurrent.getExponent()) {
                 return thisCurrent.getExponent() - otherCurrent.getExponent();
@@ -73,7 +105,7 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
                 if (otherCurrent.getCoefficient() > thisCurrent.getCoefficient()) {
                     return -1;
                 } else if (otherCurrent.getCoefficient() < thisCurrent.getCoefficient()) {
-                    return +1;
+                    return 1;
                 }
             }
 
@@ -81,15 +113,7 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
             otherCurrent = otherCurrent.getNext();
         }
 
-        if (thisCurrent == null && otherCurrent == null) {
-            return 0;
-        }
-
-        if (thisCurrent == null) {
-            return -1;
-        } else {
-            return +1;
-        }
+        return 1;
     }
 
     /**
@@ -101,7 +125,7 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
         Poly thisPolyTerm = this.head;
         Poly otherPolyTerm = poly2.head;
 
-        while (thisPolyTerm != null && otherPolyTerm != null) {
+        while(thisPolyTerm != null && otherPolyTerm != null) {
             if (thisPolyTerm.getExponent() != otherPolyTerm.getExponent()) {
                 return thisPolyTerm.getExponent() - otherPolyTerm.getExponent();
             } else {
@@ -110,59 +134,36 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
             }
         }
 
-        if (thisPolyTerm == null && otherPolyTerm == null) {
-            return 0;
-        }
+        if (thisPolyTerm == null && otherPolyTerm == null) return 0;
 
-        if (otherPolyTerm == null) {
-            return +1;
-        } else {
-            return -1;
-        }
+        if (otherPolyTerm == null) return 1;
+
+        return -1;
     }
 
     /**
-     * Polynomial sub class
+     * Overwritten toString method
+     * @return String
      */
-    public static class Poly {
-        public double coefficient;
-        public int exponent;
-        public Poly next;
-        private Poly head;
+    @Override
+    public String toString() {
+        StringBuilder exp = new StringBuilder();
 
-        public Poly(double c, int e) {
-            coefficient = c;
-            exponent = e;
-            next = null;
+        if (head.coef > 0) {
+            exp.append(head.toString());
+        } else {
+            exp.append(" - ").append(head.toString());
         }
 
-        public int getExponent() {
-            return this.exponent;
-        }
+        for (Poly temp = head.next; temp != null; temp = temp.next) {
 
-        public double getCoefficient() {
-            return this.coefficient;
-        }
-
-        public Poly getNext() {
-            return next;
-        }
-
-        @Override
-        public String toString() {
-            String termString = String.format("", Math.abs(coefficient));
-            if (exponent == 0) {
-                return termString;
-            } else if (exponent == 1) {
-                return termString + "x";
+            if ((temp.coef < 0)) {
+                exp.append(" - ").append(temp.toString());
             } else {
-                return termString + "x^" + exponent;
+                exp.append(" + ").append(temp.toString());
             }
         }
-
-        public Poly getHead() {
-            return head;
-        }
+        return exp.toString();
     }
 
     /**
@@ -173,46 +174,19 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
     public Iterator<Poly> iterator() {
         return new Iterator<Poly>() {
 
-            public Poly current = head.getHead();
+            public Poly cur = head.getHead();
 
             @Override
             public boolean hasNext() {
-                return current != null && current.getNext() != null;
+                return (cur != null) && (cur.getNext() != null);
             }
 
             @Override
             public Poly next() {
-                Poly data = current;
-                current = current.next;
+                Poly data = cur;
+                cur = cur.next;
                 return data;
             }
         };
     }
-
-    /**
-     * Overwritten toString method
-     * @return String
-     */
-    @Override
-    public String toString() {
-        StringBuilder expressionBuilder = new StringBuilder();
-
-        if (head.coefficient > 0) {
-            expressionBuilder.append(head.toString());
-        } else {
-            expressionBuilder.append(" - ").append(head.toString());
-        }
-
-
-        for (Poly tmp = head.next; tmp != null; tmp = tmp.next) {
-            if (tmp.coefficient < 0) {
-                expressionBuilder.append(" - ").append(tmp.toString());
-            } else {
-                expressionBuilder.append(" + ").append(tmp.toString());
-            }
-        }
-        return expressionBuilder.toString();
-    }
-
-
 }

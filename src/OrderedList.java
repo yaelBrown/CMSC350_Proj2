@@ -16,15 +16,10 @@ public class OrderedList {
      */
     public static <T extends Comparable<? super T> > boolean checkSorted(List<T> list) {
         boolean isSorted = true;
-
-        for(int i = list.size()-1; i > 0 ; i--) {
+        for (int i = list.size()-1; i > 0 ; i--) {
             T current = list.get(i);
-            //checks sort
-            if (!checkSorted(list, current)) {
-                isSorted = false;
-            }
+            if (!checkSorted(list, current)) { isSorted = false; }
         }
-
         return isSorted;
     }
 
@@ -36,14 +31,12 @@ public class OrderedList {
      * @return
      */
     private static <T extends Comparable<? super T> > boolean checkSorted(List<T> list, T current) {
-        T currentValue = list.get(list.indexOf(current));
+        T curValue = list.get(list.indexOf(current));
         T nextValue = list.get(list.indexOf(current) - 1);
 
-        if (nextValue != null) {
-            return currentValue.compareTo(nextValue) >= 0;
-        } else {
-            return true;
-        }
+        if (nextValue != null) { return curValue.compareTo(nextValue) >= 0; }
+
+        return true;
     }
 
 }
