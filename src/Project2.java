@@ -72,7 +72,7 @@ public class Project2 {
             ArrayList<String> temp = readFile();
             for (String e : temp) {
                 Polynomial p = new Polynomial(e);
-                System.out.println("p = " + p);
+                System.out.println("p = " + p.toString());
                 polyList.add(p);
             }
         } catch (InvalidPolynomialSyntax ex) {

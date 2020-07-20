@@ -15,10 +15,10 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
      * Polynomial sub class
      */
     public static class Poly {
-        public Poly next;
-        private Poly head;
         public double coef;
         public int exp;
+        public Poly next;
+        private Poly head;
 
         public Poly(double c, int e) {
             coef = c;
@@ -26,27 +26,21 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
             next = null;
         }
 
-        public int getExponent() {
-            return this.exp;
-        }
-        public double getCoefficient() {
-            return this.coef;
-        }
-        public Poly getNext() {
-            return next;
-        }
+        public int getExponent() { return this.exp; }
+        public double getCoefficient() { return this.coef; }
+        public Poly getNext() { return next; }
         public Poly getHead() { return head; }
 
         @Override
         public String toString() {
-            String termStr = String.format("", Math.abs(coef));
+            String t = String.format("", Math.abs(coef));
             switch(exp) {
                 case 0:
-                    return termStr;
+                    return t;
                 case 1:
-                    return termStr + "x";
+                    return t + "x";
                 default:
-                    return termStr + "x^" + exp;
+                    return t + "x^" + exp;
             }
         }
     }
@@ -56,12 +50,12 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
 
     /**
      * Constructor for Polynomial's
-     * @param pStr
+     * @param p
      */
-    public Polynomial(String pStr) {
-        Scanner termScanner = new Scanner(pStr);
+    public Polynomial(String p) {
+        Scanner ts = new Scanner(p);
         try {
-            while (termScanner.hasNext()) { addTerm(termScanner.nextDouble(), termScanner.nextInt()); }
+            while (ts.hasNext()) { addTerm(ts.nextDouble(), ts.nextInt()); }
         } catch (Exception e) {
             e.printStackTrace();
             throw new InvalidPolynomialSyntax("Input error");
@@ -74,29 +68,28 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
      * @param exponent
      */
     public void addTerm(double coefficient, int exponent) {
-        if (exponent < 0) { throw new InvalidPolynomialSyntax("Cannot process negative polynomials"); }
-        Poly cur = null;
-        head = new Poly(coefficient, exponent);
-        head.next = null;
+        if (exponent < 0) throw new InvalidPolynomialSyntax("Cannot process negative polynomials");
 
-        if (cur != null) {
-            while (cur.next != null) { cur = cur.next; }
+        Poly cur = head;
+
+        if (cur == null) {
+            head = new Poly(coefficient, exponent);
+            head.next = null;
+        } else {
+            while (cur.next != null) cur = cur.next;
             cur.next = new Poly(coefficient, exponent);
         }
     }
 
     /**
      * Used to compare Polynomials
-     * @param poly3
+     * @param p3
      * @return
      */
     @Override
-    public int compareTo(Polynomial poly3) {
+    public int compareTo(Polynomial p3) {
         Poly thisCurrent = this.head;
-        Poly otherCurrent = poly3.head;
-
-        if (thisCurrent.equals(null) && otherCurrent.equals(null)) return 0;
-        if (thisCurrent.equals(null)) return -1;
+        Poly otherCurrent = p3.head;
 
         while (thisCurrent != null && otherCurrent != null) {
             if (thisCurrent.getExponent() != otherCurrent.getExponent()) {
@@ -113,19 +106,25 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
             otherCurrent = otherCurrent.getNext();
         }
 
-        return 1;
+        if (thisCurrent == null && otherCurrent == null) return 0;
+
+        if (thisCurrent == null) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 
     /**
      * Also used to compare Polynomials
-     * @param poly2
+     * @param p2
      * @return int
      */
-    public int comparePoly(Polynomial poly2) {
+    public int comparePoly(Polynomial p2) {
         Poly thisPolyTerm = this.head;
-        Poly otherPolyTerm = poly2.head;
+        Poly otherPolyTerm = p2.head;
 
-        while(thisPolyTerm != null && otherPolyTerm != null) {
+        while (thisPolyTerm != null && otherPolyTerm != null) {
             if (thisPolyTerm.getExponent() != otherPolyTerm.getExponent()) {
                 return thisPolyTerm.getExponent() - otherPolyTerm.getExponent();
             } else {
@@ -135,10 +134,32 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
         }
 
         if (thisPolyTerm == null && otherPolyTerm == null) return 0;
-
         if (otherPolyTerm == null) return 1;
-
         return -1;
+    }
+
+    /**
+     * Overwritten iterator for Poly subclass
+     * @return Iterator<Poly>
+     */
+    @Override
+    public Iterator<Poly> iterator() {
+        return new Iterator<Poly>() {
+
+            public Poly cur = head.getHead();
+
+            @Override
+            public boolean hasNext() {
+                return (cur != null) && (cur.getNext() != null);
+            }
+
+            @Override
+            public Poly next() {
+                Poly data = cur;
+                cur = cur.next;
+                return data;
+            }
+        };
     }
 
     /**
@@ -166,27 +187,5 @@ class Polynomial implements Iterable<Polynomial.Poly>, Comparable<Polynomial> {
         return exp.toString();
     }
 
-    /**
-     * Overwritten iterator for Poly subclass
-     * @return Iterator<Poly>
-     */
-    @Override
-    public Iterator<Poly> iterator() {
-        return new Iterator<Poly>() {
 
-            public Poly cur = head.getHead();
-
-            @Override
-            public boolean hasNext() {
-                return (cur != null) && (cur.getNext() != null);
-            }
-
-            @Override
-            public Poly next() {
-                Poly data = cur;
-                cur = cur.next;
-                return data;
-            }
-        };
-    }
 }
